@@ -6,3 +6,11 @@ __pycache__/
 
 # 内部の設計・解析資料（教材本体ではない。ローカル参照用）
 docs/
+
+# MkDocs（GitHub Pages 公開用）
+# site_src/ は MkDocs のソース。手で管理する index.md・stylesheets/ だけを追跡し、
+# build_docs.py が生成する part-*/・assets/ と、ビルド成果物 site/ は無視する。
+site/
+site_src/part-*/
+site_src/assets/
+.DS_Store

@@ -1,0 +1,145 @@
+/* テーマカラー: 黒と白を基調にしたモノクロ配色。
+   PRIMARY=ヘッダー/サイドバー/フッター、ACCENT=リンク/ホバー。
+   モノクロでは色だけでリンクを判別できないため、本文リンクには下線を付ける。 */
+
+/* ライトモード: 白背景・黒ヘッダー・黒リンク（下線） */
+:root {
+  --md-primary-fg-color: #000000;
+  --md-primary-fg-color--light: #2b2b2b;
+  --md-primary-fg-color--dark: #000000;
+  --md-accent-fg-color: #000000;
+  --md-accent-fg-color--transparent: rgba(0, 0, 0, 0.1);
+  /* 本文リンクの色（既定はプライマリ＝黒）。下線と合わせて判別する */
+  --md-typeset-a-color: #000000;
+}
+
+/* ダークモード: スレートの青みを中和し、ニュートラルな黒基調にする */
+[data-md-color-scheme="slate"] {
+  --md-hue: 0;
+  --md-primary-fg-color: #000000;
+  --md-primary-fg-color--light: #2b2b2b;
+  --md-primary-fg-color--dark: #000000;
+  --md-accent-fg-color: #ffffff;
+  --md-accent-fg-color--transparent: rgba(255, 255, 255, 0.1);
+  /* ダークでは本文リンクを白にして視認性を確保（下線で判別） */
+  --md-typeset-a-color: #ffffff;
+  /* 青みのない、ニュートラルな暗色の背景・サーフェス */
+  --md-default-bg-color: #141414;
+  --md-code-bg-color: #1e1e1e;
+}
+
+/* ヘッダー/フッターを背景から際立たせる細い境界線 */
+.md-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* ホームページのヒーローセクション */
+.hero {
+  text-align: center;
+  padding: 2rem 0 1rem;
+}
+
+.hero p:first-of-type {
+  font-size: 1.4rem;
+  font-weight: 700;
+  /* プライマリ（黒）だとダークモードで見えないため、本文色を使う */
+  color: var(--md-default-fg-color);
+}
+
+/* 本文リンク: モノクロのため下線で「リンクである」ことを示す */
+.md-typeset a {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  text-decoration-thickness: 1px;
+}
+
+.md-typeset a:hover,
+.md-typeset a:focus {
+  text-decoration-thickness: 2px;
+}
+
+/* 見出しのアンカー（permalink）には下線を付けない */
+.md-typeset a.headerlink {
+  text-decoration: none;
+}
+
+/* フッターの "Made with Material for MkDocs" を非表示 */
+.md-copyright {
+  display: none;
+}
+
+/* 見出しの視認性を改善 */
+.md-typeset h1 {
+  font-weight: 700;
+  color: var(--md-default-fg-color);
+}
+
+.md-typeset h2 {
+  font-weight: 600;
+  color: var(--md-default-fg-color);
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+  padding-bottom: 0.4rem;
+}
+
+.md-typeset h3 {
+  font-weight: 600;
+  color: var(--md-default-fg-color);
+}
+
+/* ダークモード: テキストの視認性を改善 */
+[data-md-color-scheme="slate"] .md-typeset {
+  color: rgba(255, 255, 255, 0.87);
+}
+
+[data-md-color-scheme="slate"] .md-typeset h1,
+[data-md-color-scheme="slate"] .md-typeset h2,
+[data-md-color-scheme="slate"] .md-typeset h3 {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+[data-md-color-scheme="slate"] .md-typeset h2 {
+  border-bottom-color: rgba(255, 255, 255, 0.12);
+}
+
+[data-md-color-scheme="slate"] .md-typeset code {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* ヘッダーロゴ: SVG を非表示にしつつリンクエリアをタイトル全体に広げる */
+.md-header__button.md-logo {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  z-index: 1;
+  opacity: 0;
+}
+
+.md-header__button.md-logo svg {
+  display: none;
+}
+
+.md-header__inner {
+  position: relative;
+}
+
+.md-header__ellipsis {
+  cursor: pointer;
+}
+
+/* フッター前/次ナビの視認性を改善 */
+.md-footer__link {
+  padding: 1rem 1.5rem;
+  border-radius: 0.4rem;
+  transition: background-color 0.2s;
+}
+
+.md-footer__link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.md-footer__title {
+  font-size: 0.9rem;
+  font-weight: 600;
+}

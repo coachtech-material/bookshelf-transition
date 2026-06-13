@@ -1,0 +1,117 @@
+site_name: Laravel 実践ステップアップ講座
+site_description: 2026年2月以前の教材で Laravel を学んだ方が、公開 REST API・認可・自動テスト・多対多・集計・Sail といった新しい実践技術を身につけ、新しい模擬案件に対応できるようになる教材。
+site_url: https://coachtech-material.github.io/bookshelf-transition/
+
+docs_dir: site_src
+
+theme:
+  name: material
+  language: ja
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-7
+        name: ダークモードに切り替え
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-4
+        name: ライトモードに切り替え
+  font:
+    text: Noto Sans JP
+    code: JetBrains Mono
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - toc.follow
+  icon: {}
+
+extra:
+  generator: false
+
+extra_css:
+  - stylesheets/custom.css
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+nav:
+  - トップ: index.md
+  - Part 1 前提と開発環境を整える:
+    - Chapter 1 学習の地図と PHP OOP:
+      - 1-1 この教材の全体像と進め方: part-01/chapter-01/1-1.md
+      - 1-2 PHP OOP の基礎: part-01/chapter-01/1-2.md
+    - Chapter 2 開発環境 Sail と Laravel 8to10:
+      - 2-1 Laravel Sail で環境構築する: part-01/chapter-02/2-1.md
+      - 2-2 Laravel 8 から 10 への変更点: part-01/chapter-02/2-2.md
+      - "2-3 ハンズオン: Laravel Sail プロジェクトを立ち上げる": part-01/chapter-02/2-3.md
+  - Part 2 Laravel の新概念（多対多・認可・集計・テスト）:
+    - Chapter 3 多対多リレーションの実践:
+      - 3-1 多対多とピボットテーブル: part-02/chapter-03/3-1.md
+      - 3-2 ピボット操作（attach / detach / sync / toggle）: part-02/chapter-03/3-2.md
+    - Chapter 4 認可 Policy で所有者を守る:
+      - 4-1 認可とは／Gate: part-02/chapter-04/4-1.md
+      - 4-2 Policy の作成・登録・適用: part-02/chapter-04/4-2.md
+      - "4-3 ハンズオン: 投稿の所有者だけ編集・削除できるようにする": part-02/chapter-04/4-3.md
+    - Chapter 5 集計とパフォーマンス:
+      - 5-1 集計クエリとランキング: part-02/chapter-05/5-1.md
+      - 5-2 Eager Loading の使い分けと N+1: part-02/chapter-05/5-2.md
+    - Chapter 6 自動テストを書く:
+      - 6-1 テストの基礎（PHPUnit / Factory / RefreshDatabase）: part-02/chapter-06/6-1.md
+      - 6-2 機能テスト（CRUD・認可・バリデーション）: part-02/chapter-06/6-2.md
+      - 6-3 API テストとカバレッジ: part-02/chapter-06/6-3.md
+  - Part 3 公開 REST API:
+    - Chapter 7 API の基礎と Resource:
+      - 7-1 REST API とルート設計: part-03/chapter-07/7-1.md
+      - 7-2 API Resource でレスポンスを整形する: part-03/chapter-07/7-2.md
+      - 7-3 API 開発ツール（Postman）: part-03/chapter-07/7-3.md
+    - Chapter 8 検索・ページネーションとエラー設計:
+      - 8-1 検索・絞り込み・ページネーション: part-03/chapter-08/8-1.md
+      - 8-2 エラー設計と JSON 例外: part-03/chapter-08/8-2.md
+      - "8-3 ハンズオン: 公開タスク API を実装する": part-03/chapter-08/8-3.md
+  - Part 4 総合ハンズオン（タスク管理アプリをゼロから）:
+    - Chapter 9 総合ハンズオン① 設計から CRUD まで:
+      - 9-1 要件定義と設計: part-04/chapter-09/9-1.md
+      - 9-2 環境構築と提供 Blade アセットの配置: part-04/chapter-09/9-2.md
+      - 9-3 マイグレーションとモデル（リレーション定義）: part-04/chapter-09/9-3.md
+      - 9-4 認証（Fortify）: part-04/chapter-09/9-4.md
+      - 9-5 CRUD（カテゴリ・タスク）と多対多操作: part-04/chapter-09/9-5.md
+    - Chapter 10 総合ハンズオン② 認可・集計・API・テスト・仕上げ:
+      - 10-1 認可（Policy）: part-04/chapter-10/10-1.md
+      - 10-2 集計機能: part-04/chapter-10/10-2.md
+      - 10-3 公開 API: part-04/chapter-10/10-3.md
+      - 10-4 自動テスト: part-04/chapter-10/10-4.md
+      - 10-5 仕上げ（Pint・README・Issue 駆動の振り返り・提出前チェック）: part-04/chapter-10/10-5.md
+      - 10-6 まとめ：身につけた力と次のステップ: part-04/chapter-10/10-6.md
