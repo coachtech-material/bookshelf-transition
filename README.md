@@ -1,212 +1,82 @@
-# 教材執筆フレームワーク
+# Laravel 実践ステップアップ講座
 
-Claude Code のスキルを使って、技術教材の設計から執筆・レビュー・メンテナンスまでを行うフレームワークです。
+2026年2月以前の教材で Laravel を学び、ひととおり CRUD アプリを作れるようになった方が、**2026年3月以降の教材と同じ技術レベル**に到達し、新しい模擬案件に対応できるようになるための教材です。すでに学んだ内容は省き、**新しく必要になる実践技術**（公開 API・認可・自動テスト・多対多リレーション・集計・Laravel Sail）に集中します。
 
-「誰に、なぜ、何を教えるか」を対話で定義し、その哲学に基づいて構造を MECE に分解し、一貫した品質で教材を書き上げます。
+> 本リポジトリは、教材本体（`curriculums/`）と、それを Claude Code のスキルで設計・執筆・保守するためのワークフロー一式です。教材の設計思想は [`CLAUDE.md`](./CLAUDE.md)、カリキュラム設計は [`OUTLINE.md`](./OUTLINE.md)、執筆ルールは [`.claude/rules/writing.md`](./.claude/rules/writing.md) を参照してください。
 
-## クイックスタート
+## 学べること
+
+| テーマ | 内容 |
+|---|---|
+| 公開 REST API | ルート設計（apiResource・バージョニング）、API Resource、検索・ページネーション、JSON 例外・ステータス制御 |
+| 認可（Policy） | Gate と Policy、所有者ベースのアクセス制御 |
+| 多対多リレーション | ピボットテーブル設計、`belongsToMany`、`attach`/`sync`/`toggle` |
+| 集計とパフォーマンス | `withCount`/`withAvg` による集計・ランキング、`with`/`load` と N+1 回避 |
+| 自動テスト | PHPUnit の Feature/Unit テスト、Factory・RefreshDatabase、JSON/DB アサーション |
+| 開発環境 | Laravel Sail（Docker）、Laravel 8 → 10 の変更点、PHP OOP の基礎 |
+
+## 技術スタック
+
+- Laravel 10.x / PHP 8.1+
+- Laravel Sail（Docker）+ MySQL 8
+- Laravel Fortify（認証）/ PHPUnit 10（テスト）/ Tailwind CSS + Vite（フロント）
+- ハンズオン題材: タスク管理アプリ（スターターキット `coachtech-material/laravel-api-starter` 等を流用）
+
+## 教材の構成
+
+3層（Part > Chapter > Section）/ 全 **4 部・10 章・31 節**。想定学習時間は約 **40〜50 時間**。
+
+| Part | テーマ |
+|---|---|
+| Part 1 | 前提と開発環境を整える（差分の地図・PHP OOP・Sail・Laravel 8→10） |
+| Part 2 | Laravel の新概念（多対多・認可 Policy・集計・自動テスト） |
+| Part 3 | 公開 REST API（ルート設計・Resource・検索/ページネーション・エラー設計） |
+| Part 4 | 総合ハンズオン（タスク管理アプリをゼロから構築し、学んだ技術を統合） |
+
+各 Section のゴール・種類・依存関係は [`OUTLINE.md`](./OUTLINE.md) を参照。概念 Section を主軸に、各技術を **Why → What → How** の順で解説し、認可・API は章末ハンズオン（スターターキット）で実践、最後の総合ハンズオンでゼロからアプリを構築して統合します。
+
+## リポジトリ構成
+
+```
+.
+├── CLAUDE.md              # 教材の哲学（WHO/WHY/WHAT/HOW/MAP）
+├── OUTLINE.md             # カリキュラム設計（4部/10章/31節）
+├── curriculums/           # 教材本体（Part > Chapter > Section）
+├── video/                 # Remotion による Section 解説動画プロジェクト
+├── .claude/
+│   ├── rules/writing.md   # 執筆ルール（文体・テンプレート・用語・図表）
+│   ├── skills/            # 設計・執筆・レビュー等のスキル定義
+│   └── settings.json
+└── docs/                  # 設計根拠・解析資料（ローカル参照用・Git 管理外）
+```
+
+## 開発ワークフロー（Claude Code スキル）
+
+本教材は Claude Code のスキルで設計・執筆・保守します。
+
+| スキル | 役割 |
+|---|---|
+| `/setup` | 哲学定義 → 構造設計 → 執筆ルール調整（CLAUDE.md・OUTLINE.md・writing.md を生成） |
+| `/write` | OUTLINE に基づいて Section を執筆 |
+| `/review` | 品質・設計整合・正確性・実践フォロー可能性をレビュー |
+| `/check-updates` | Laravel 公式ドキュメントとの鮮度チェック |
+| `/illustrate` | Gemini で概念図を生成・挿入（各概念 Section に 1 枚。`GEMINI_API_KEY` が必要） |
+| `/animate` | Remotion で Section 解説動画（アニメ＋ナレーション＋字幕）を生成・挿入 |
+| `/github-pages` | MkDocs Material + GitHub Actions で GitHub Pages に公開 |
 
 ```bash
-# 1. クローン
-git clone https://github.com/yotaro0616/curriculum-writer.git my-curriculum
-cd my-curriculum
-
-# 2. Claude Code で対話的にセットアップ
-/setup
-
-# 3. 執筆
+# 例: Chapter 1 を執筆
 /write Chapter 1
+
+# 例: Part 2 をレビュー
+/review Part 2
 ```
 
-`/setup` を実行すると、対話を通じて CLAUDE.md（哲学）・OUTLINE.md（構造）・writing.md（執筆ルール）が生成されます。あとは `/write` で書き、`/review` でチェックするだけです。
-
----
-
-## 設計思想
-
-### 抽象から具体へ
-
-```mermaid
-flowchart TD
-    A["CLAUDE.md\n哲学"]
-
-    subgraph outline["OUTLINE.md — 構造設計"]
-        direction LR
-        B1["Chapter 1\nSection 1-1 / 1-2"]
-        B2["Chapter 2\nSection 2-1 / 2-2"]
-        B3["… Chapter N"]
-    end
-
-    subgraph curr["curriculums/ — 教材本体"]
-        direction LR
-        C1["1-1.md"]
-        C2["1-2.md"]
-        C3["2-1.md"]
-        C4["2-2.md"]
-        C5["… N-1.md, N-2.md"]
-    end
-
-    A -->|MECE 分解| B1 & B2 & B3
-    B1 -->|執筆| C1 & C2
-    B2 -->|執筆| C3 & C4
-    B3 -->|執筆| C5
-
-    W["writing.md\nルール・人格・用語"] -.->|執筆時に適用| curr
-```
-
-| 層 | ファイル | 役割 |
-|---|---|---|
-| 哲学 | `CLAUDE.md` | 誰に、なぜ、何を、どう教えるか |
-| 設計 | `OUTLINE.md` | 各 Section のゴール・種類・順序・依存関係 |
-| ルール | `writing.md` | 文体・テンプレート・用語・図表形式 |
-| コンテンツ | `curriculums/` | 読者に届く教材そのもの |
-
-### 階層構造
-
-教材の規模に応じて `/setup` で選択します。
-
-| 層数 | 構造 | 用途 |
-|---|---|---|
-| 3層 | Part > Chapter > Section | 大規模教材（複数の大テーマ） |
-| 2層 | Chapter > Section | 中規模教材（1テーマを深掘り） |
-| 1層 | Section のみ | 小規模教材・ガイド集 |
-
-### 3種の Section
-
-各 Section には種類を付与し、テンプレートの構造を決定します。
-
-| 種類 | 内容 | 選択基準 |
-|---|---|---|
-| **概念** | 意義・仕組み・使い方を解説 | 手を動かす要素がない |
-| **ハンズオン** | 概念で学んだ機能を実践 | 事前に概念 Section で学んだ内容を実践する |
-| **混合** | 概念を学びながらすぐに手を動かす | 概念と実践を分けると不自然 |
-
-すべての種類で共通の骨格（🎯学習目標 → 導入/🧠 → 本文 → ✨まとめ）を持ち、種類ごとに本文の構成が異なります。ハンズオン・混合では `## 🏃 実践` > `### 🏃 Step N` の統一された Step 構造を使います。
-
----
-
-## 6つのスキル
-
-| スキル | やること | 入力例 |
-|---|---|---|
-| `/setup` | 教材の哲学定義 → 構造設計 → 執筆ルール調整 | `/setup` |
-| `/write` | OUTLINE に基づいて執筆 | `/write Chapter 2-1`, `/write 全て` |
-| `/review` | 4観点でレビュー（自動修正しない） | `/review Part 1` |
-| `/check-updates` | 参考資料との鮮度チェック | `/check-updates` |
-| `/illustrate` | Gemini で概念図を生成・挿入 | `/illustrate Part 2`, `/illustrate plan 2-1` |
-| `/github-pages` | MkDocs Material で GitHub Pages に公開 | `/github-pages new`, `/github-pages deploy` |
-
-### /setup の流れ
-
-対話形式で5つの Phase を進めます。
+設計の三層（哲学 → 構造 → 本体）は次の関係です。
 
 ```mermaid
 flowchart LR
-    P0["Phase 0\nTOPIC・スコープ確定"] -->|承認| P1["Phase 1\n哲学の定義\nWHO/WHY/WHAT/HOW/MAP"]
-    P1 -->|承認| P2["Phase 2\nOUTLINE 構造化\nMECE 分解"]
-    P2 -->|承認| P3["Phase 3\nwriting.md\nルール調整"]
-    P3 --> P4["Phase 4\n最終確認"]
-```
-
-各 Phase の完了時にユーザーの承認を取ってから次に進みます。途中でスコープが変わった場合は Phase 0 に戻って再確認します。
-
-### /write の流れ
-
-```mermaid
-flowchart LR
-    W1["1. 準備\n参考資料取得・整理"] --> W2["2. 方針合わせ\n体験設計・見出し構成"]
-    W2 --> W3["3. 執筆"]
-    W3 --> W4["4. セルフチェック"]
-    W4 -.->|提案| R["/review"]
-```
-
-- 参考資料から数値・仕様を箇条書きで整理し、記憶ではなくその整理結果を参照して書く
-- 大規模スコープでは Chapter 単位で方針合わせと中間チェックを行う
-- 完了後に `/review` の実行を提案する
-
-### /review の観点
-
-| 観点 | 内容 |
-|---|---|
-| ルール準拠 | writing.md のテンプレート・文体に従っているか |
-| 設計との整合 | OUTLINE.md のゴール・種類と一致しているか |
-| 正確性 | 参考資料の表記に従っているか |
-| 実践フォロー可能性 | ハンズオンを読者だけで完遂できるか |
-
-レビュー前に Grep ベースの機械的チェック（太字スペース・ダッシュ記号・言語指定なしコードブロック等）を自動実行し、誤検知を減らします。
-
-### /illustrate の流れ
-
-Gemini（3 Pro Image）で、Mermaid では表現しにくい「直感的なメンタルモデル」を概念図として生成・挿入します。
-
-| モード | やること |
-|---|---|
-| `plan` | 指定範囲の対象 Section を列挙し、中心概念・タイプ・画像名を計画として報告（生成しない・コスト確認ゲート） |
-| `generate` | スコープ内の未生成 Section を一括生成・挿入（`--yes` で確認スキップ、`--force` で再生成） |
-| フル | plan → ユーザー確認 → generate を一気通貫で実行 |
-
-画像は導入セクションの 🧠 直後に配置し、生成済み Section は再実行時にスキップします（冪等）。Mermaid（正確な処理フロー）と illustrate（メンタルモデル・俯瞰図）を使い分けます。画像の密度方針（各概念 Section に 1 枚 / 判断ベース）は `/setup` で選べます。
-
-> **前提**: `GEMINI_API_KEY` 環境変数の設定が必要です。[Google AI Studio](https://aistudio.google.com/apikey) で取得できます。
-
-### /github-pages の流れ
-
-教材を MkDocs Material + GitHub Actions で GitHub Pages に公開します。`curriculums/`（日本語パス）を `build_docs.py` が英語スラッグの `docs/` に変換し、`mkdocs build --strict` でビルド、`main` への push で GitHub Actions が自動デプロイします。
-
-| 依頼 | やること |
-|---|---|
-| 新規構築 | mkdocs.yml・ナビ・テーマ色を生成 → ローカル検証 → 公開 |
-| 更新 | `curriculums/` を編集して push（CI が自動再ビルド） |
-| デプロイ確認 | `gh run watch` と公開 URL の疎通確認 |
-
-> **注**: 同梱スクリプトは 3層構成（Part > Chapter > Section）前提です。公開は外向き操作のため、push・公開化の各ゲートでユーザー確認を取ります。
-
----
-
-## ワークフロー
-
-```mermaid
-flowchart LR
-    setup["/setup"] --> write["/write"]
-    write --> review["/review"]
-    review -->|修正| write
-    review --> publish["/github-pages\n（公開）"]
-    check["/check-updates\n（定期実行）"] -->|更新必要| write
-    illustrate["/illustrate"] -->|画像挿入| write
-```
-
-### 初回
-
-1. `/setup` で対話的に CLAUDE.md・OUTLINE.md・writing.md を生成
-2. `/write` で Section を執筆（Part / Chapter / Section 単位、または全体一括）
-3. `/review` でレビュー、指摘を修正
-
-### メンテナンス
-
-- 参考資料がオンラインの場合: `/check-updates` を月1回実行
-- 破壊的変更が見つかったら `/write` で即修正
-- 構成変更が必要な場合は `/setup` を再実行
-
----
-
-## ファイル構成
-
-```
-project-root/
-├── CLAUDE.md                 # 哲学（WHO/WHY/WHAT/HOW/MAP）
-├── OUTLINE.md                # 構造設計
-├── README.md
-├── .claude/
-│   ├── rules/writing.md      # 執筆ルール（文体・テンプレート・用語）
-│   ├── skills/
-│   │   ├── setup/            # /setup スキル
-│   │   ├── write/            # /write スキル
-│   │   ├── review/           # /review スキル
-│   │   ├── check-updates/    # /check-updates スキル
-│   │   ├── illustrate/       # /illustrate スキル
-│   │   └── github-pages/     # /github-pages スキル
-│   └── settings.json
-├── curriculums/              # 教材本体（階層構造に応じたディレクトリ）
-└── assets/
-    └── diagrams/             # /illustrate の生成画像・プロンプト
+    A["CLAUDE.md<br/>哲学（誰に・なぜ・何を・どう）"] -->|MECE 分解| B["OUTLINE.md<br/>構造（4部/10章/31節）"]
+    B -->|執筆| C["curriculums/<br/>教材本体"]
+    W["writing.md<br/>文体・人格・用語・図表"] -.->|執筆時に適用| C
 ```
