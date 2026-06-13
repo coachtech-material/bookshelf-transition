@@ -1,0 +1,8 @@
+.claude/settings.local.json
+
+# Python (github-pages スキルの同梱スクリプト由来)
+__pycache__/
+*.pyc
+
+# 内部の設計・解析資料（教材本体ではない。ローカル参照用）
+docs/
