@@ -105,6 +105,24 @@
   color: rgba(255, 255, 255, 0.85);
 }
 
+/* 左ナビ: 現在のセクションを明示する。
+   モノクロ配色では色（黒）だけだと本文色（87%黒）と区別がつかないため、
+   太字＋背景＋左の縦線で「いま見ているセクション」が分かるようにする。
+   背景・縦線は --md-default-fg-color 系の変数を使い、ライト/ダーク両対応にする。 */
+.md-nav--primary .md-nav__link--active,
+.md-nav--primary .md-nav__link--active:hover,
+.md-nav--primary .md-nav__link--active:focus {
+  font-weight: 700;
+  color: var(--md-default-fg-color);
+}
+
+.md-nav--primary .md-nav__item .md-nav__link--active {
+  background-color: var(--md-default-fg-color--lightest);
+  border-radius: 0.1rem;
+  box-shadow: inset 0.18rem 0 0 var(--md-default-fg-color);
+  padding-left: 0.5rem;
+}
+
 /* ヘッダーロゴ: SVG を非表示にしつつリンクエリアをタイトル全体に広げる */
 .md-header__button.md-logo {
   position: absolute;
