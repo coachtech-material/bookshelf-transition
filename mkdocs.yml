@@ -1,5 +1,5 @@
-site_name: Laravel 実践ステップアップ講座
-site_description: 2026年2月以前の教材で Laravel を学んだ方が、公開 REST API・認可・自動テスト・多対多・集計・Sail といった新しい実践技術を身につけ、新しい模擬案件に対応できるようになる教材。
+site_name: COACHTECH × Laravel ステップアップガイド
+site_description: COACHTECH の Laravel 教材で CRUD アプリを作れるようになった方が、公開 REST API・認可・自動テスト・多対多・集計・Laravel Sail を学ぶ実践ガイド。
 site_url: https://coachtech-material.github.io/bookshelf-transition/
 
 docs_dir: site_src
