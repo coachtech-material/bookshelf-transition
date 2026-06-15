@@ -1,0 +1,112 @@
+{
+  "_doc": "デザイン検証用テストベッド（TTSなし・静止画確認用）。各シーン型を1枚ずつ含む。実SectionのpropsはTTSスクリプトがstoryboardから生成する。",
+  "sectionId": "_testbed",
+  "sectionLabel": "Part 1 学習の地図と PHP OOP / Chapter 1",
+  "title": "PHP OOP の基礎",
+  "scenes": [
+    {
+      "id": "title",
+      "type": "title",
+      "sectionNo": "1-2",
+      "title": "PHP OOP の基礎",
+      "subtitle": "「動くけれど説明できない」を解く",
+      "narration": "Laravel のコードを、PHP の文法という視点から読み解きます。",
+      "audioFrames": 120,
+      "totalFrames": 150
+    },
+    {
+      "id": "class-vs-instance",
+      "type": "codeCompare",
+      "heading": "クラスとインスタンス",
+      "left": {
+        "label": "クラス（設計図）",
+        "lines": [
+          "class Task",
+          "{",
+          "    public string $title;",
+          "    public bool $done = false;",
+          "}"
+        ],
+        "caption": "設計図は1つ"
+      },
+      "right": {
+        "label": "インスタンス（実体）",
+        "lines": [
+          "$task = new Task();",
+          "$task->title = 'work';",
+          "$task->complete();"
+        ],
+        "caption": "実体はいくつでも"
+      },
+      "narration": "クラスは設計図、インスタンスはそこから new で作る実体です。",
+      "audioFrames": 120,
+      "totalFrames": 150
+    },
+    {
+      "id": "prop-method",
+      "type": "keypoint",
+      "heading": "プロパティとメソッド",
+      "cards": [
+        { "title": "プロパティ", "body": "クラスが持つデータ。$title や $done のこと。" },
+        { "title": "メソッド", "body": "クラスが持つふるまい。complete() や save() のこと。" }
+      ],
+      "narration": "プロパティはデータ、メソッドはふるまいです。",
+      "audioFrames": 120,
+      "totalFrames": 150
+    },
+    {
+      "id": "new-flow",
+      "type": "flow",
+      "heading": "new で実体が生まれる",
+      "steps": [
+        { "label": "class 定義" },
+        { "label": "new", "emphasis": true },
+        { "label": "インスタンス" },
+        { "label": "操作" }
+      ],
+      "tagline": "new するたび別の実体",
+      "narration": "new するたびに、別々の実体が生まれます。",
+      "audioFrames": 120,
+      "totalFrames": 150
+    },
+    {
+      "id": "namespace-nest",
+      "type": "nest",
+      "heading": "名前空間とファイルの対応",
+      "layers": [
+        { "label": "Task", "desc": "クラス" },
+        { "label": "App\\Models", "desc": "名前空間" },
+        { "label": "app/Models/", "desc": "ディレクトリ" }
+      ],
+      "formula": "App\\Models\\Task  ⇄  app/Models/Task.php",
+      "narration": "名前空間とディレクトリ構造は対応しています。",
+      "audioFrames": 120,
+      "totalFrames": 150
+    },
+    {
+      "id": "inheritance-figure",
+      "type": "figure",
+      "heading": "継承（extends）",
+      "src": "figures/1-2-inheritance.jpg",
+      "alt": "継承の比喩図",
+      "narration": "空のモデルが動くのは、extends で親の機能を受け継いでいるからです。",
+      "audioFrames": 120,
+      "totalFrames": 150
+    },
+    {
+      "id": "outro",
+      "type": "outro",
+      "heading": "まとめ",
+      "points": [
+        "クラスは設計図、インスタンスは new で作る実体",
+        "$this はそのメソッドを呼んでいるインスタンス自身",
+        "extends で親クラスの機能を受け継ぐ",
+        "名前空間と use でクラスを区別・取り込みする"
+      ],
+      "next": "2-1 Laravel Sail で環境構築する",
+      "narration": "次は開発環境を、Laravel Sail で整えます。",
+      "audioFrames": 120,
+      "totalFrames": 150
+    }
+  ]
+}

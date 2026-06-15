@@ -3,16 +3,21 @@
 ストーリーボードは動画の **単一の真実**（差分管理する設計図）。`video/data/<sectionId>.storyboard.json` に置く。
 TTS スクリプトがこれを読み、音声と実測尺を埋めた `<sectionId>.props.json` を生成する（props.json は成果物なので手で編集しない）。
 
+動画の役割（要約ではなく Section の主たる学習路）と尺・シーン数の基準は `criteria.md` を参照する。本ファイルは JSON の形式と台本の書き方を定める。
+
 ## トップレベル
 
 ```json
 {
-  "sectionId": "1-2-1",
-  "sectionLabel": "Part 1 Java 言語の基礎 / Chapter 2 基本文法",
-  "title": "変数と型",
+  "sectionId": "1-2",
+  "sectionLabel": "Part 1 学習の地図と PHP OOP / Chapter 1",
+  "title": "PHP OOP の基礎",
   "scenes": [ ... ]
 }
 ```
+
+- `sectionId` は教材のセクション番号（2 連番。例 `1-2`・`8-1`）。音声フォルダ名・mp4 名・配信 URL に使う
+- `sectionLabel` は画面右上のチップと title シーンのラベルに出る（`Part X タイトル / Chapter Y` 形式）
 
 ## シーン共通フィールド
 
@@ -29,29 +34,36 @@ TTS スクリプトがこれを読み、音声と実測尺を埋めた `<section
 ## シーン型カタログ
 
 - **title**: `sectionNo` / `title` / `subtitle`（導入の問いかけ 1 文）
-- **codeCompare**: `left` / `right` の 2 ペイン。各ペインは `label`・`labelColor`（PHP は `#777BB3`、Java は `#ED8B00`、中立は省略で Java Blue）・`lines`（コード行の配列。コメントは `//` 以降が自動で淡色化）・`errorLine`（0 始まり。コンパイルエラー演出を付ける行）・`caption`（ペイン下の一言。errorLine があると赤字になる）。右ペインはナレーション後半（45% 時点）で登場する
-- **keypoint**: `cards`（2 枚。`title` と `body`）。二項対立の整理用
-- **figure**: `src`（`figures/<name>.jpg`。事前に `assets/diagrams/output/` から `video/public/figures/` へ cp する）・`alt`
-- **flow**: `steps`（`label`・`sub`・`emphasis`）+ 任意の `fanout`（分岐先チップ）+ 任意の `tagline`（締めの標語）
-- **nest**: `layers`（**内側 → 外側**の順に 3 つまで。`label`・`desc`）+ 任意の `formula`（例: `JDK ⊃ JRE ⊃ JVM`）
-- **outro**: `points`（まとめ 4 点以内）+ `next`（次セクション番号とタイトル）
+- **codeCompare**: `left` / `right` の 2 ペイン。各ペインは `label`・`labelColor`・`lines`（コード行の配列。コメントは `//` 以降が自動で淡色化）・`errorLine`（0 始まり。エラー演出を付ける行）・`caption`（ペイン下の一言。errorLine があると赤字になる）。右ペインはナレーション後半（45% 時点）で登場する
+  - `labelColor`: 中立は **省略**（既定で青 `theme.primary`）。対比で左右を色分けしたいときだけ、片方に `theme.accent`（オレンジ）相当の色を渡す。教材のアクセントは青・オレンジに統一し、言語ロゴ色などは使わない
+  - コードは「読み解く対象」。長すぎる全文は載せず、要点の数行に絞る（コピペ用の全文は本文が担う）
+- **keypoint**: `cards`（2 枚。`title` と `body`）。二項対立・定義の対比用（1 枚目が青、2 枚目がオレンジで描かれる）
+- **figure**: `src`（`figures/<name>.jpg`。事前に `assets/diagrams/output/` から `video/public/figures/` へ cp する）・`alt`。/illustrate の白背景の概念図を額装して見せる
+- **flow**: `steps`（`label`・`sub`・`emphasis`）+ 任意の `fanout`（分岐先チップ）+ 任意の `tagline`（締めの標語）。`emphasis: true` のステップはオレンジで強調される
+- **nest**: `layers`（**内側 → 外側**の順に 3 つまで。`label`・`desc`）+ 任意の `formula`（例: `App\Models ⊃ Task`）
+- **outro**: `points`（まとめ 4 点以内。Section の ✨ に対応）+ `next`（次セクション番号とタイトル）
+
+### 記号の安全性
+
+ラベル・formula に使う記号は、フォントで確実に出るものに限る。矢印は `→` `↔`、包含は `⊃`、区切りは `/` を使う。`⇄` など稀な記号はフォント次第で別の字（`≠` 等）に化けることがあるので避ける。コード記号（`->` `::` `$`）はコード行（`lines`）の中だけで使い、ラベルや narration には持ち込まない。
 
 ## narration（字幕用原稿）の書き方
 
-- 敬体。writing.md の文体・用語ルールに従う（ダッシュ記号は使わない）
+- 敬体。writing.md の文体・用語ルールに従う（ダッシュ記号 `—` は使わない）
 - **音読して自然な文** にする（字幕は文・読点単位で分割表示され、文字送りされる）
-- 1 文 50 字以内を目安に句点で区切る。コード記号の読み上げは避け、口頭の言い回しに直す（`int x = 1;` →「int の変数に 1 を入れる」）
-- まとめシーンの最後は次セクションへの接続文で締める
+- 1 文 50 字以内を目安に句点で区切る。コード記号の読み上げは避け、口頭の言い回しに直す（`$this->done = true;` →「this が指すインスタンスの done を true にする」）
+- Why → What → How の流れを台本全体で通す。各シーンの narration は前のシーンを受けて自然につながるようにする
+- outro シーンの最後は次セクションへの接続文で締める（OUTLINE.md の次セクションのゴールのキーワードを含める）
 
 ## reading（読み上げ用原稿）の書き方
 
 - narration と同じ内容を、**読み辞書 `video/data/pronunciation.json` を適用してカタカナ展開** したもの
 - 辞書にない英語用語・記号が出てきたら、**先に辞書へ追加してから** reading に使う（プロジェクト全体で読みを統一するため）
 - 間を取りたい位置に読点を増やしてよい（narration と句読点が一致する必要はない）
-- 数字の読みが紛れやすい箇所はひらがな・カタカナで明示する（「1-2-1」→「いち、に、いち」）
+- 数字・記号の読みが紛れやすい箇所はひらがな・カタカナで明示する（「1-2」→「いち、に」／「N+1」→「エヌ、プラス、いち」）
 
 ## 検収（QA）
 
-1. レンダ後、シーン中間フレームを 3〜4 枚 still 書き出しして Read で目視（文字切れ・はみ出し・字幕の重なり）
+1. レンダ後、シーン中間フレームを 3〜4 枚 still 書き出しして Read で目視（文字切れ・はみ出し・字幕の重なり・ラベルの化け）
 2. 冒頭シーンの音声を試聴（読み・速度・トーン）。読み間違いは SKILL.md の「音声・台本の修正サイクル」で直す
-3. 尺が 3 分を超えていたら narration を削る（シーンを削るより文を削る）
+3. 尺が 6 分を大きく超えていたら narration を削る（シーンを削るより文を削る）。逆に 3 分に満たず説明が足りないなら、🎯 / ✨ の取りこぼしがないか確認する

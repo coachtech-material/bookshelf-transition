@@ -6,10 +6,10 @@ argument-hint: "<plan|generate|スコープ> [対象]"
 
 # animate - Section 解説動画の生成と挿入
 
-Remotion（React ベースの動画フレームワーク）で、各 Section の解説動画（1.5〜3 分、1080p mp4）を生成・挿入する。
-静止画の `/illustrate` が「直感的なメンタルモデル 1 枚」を担うのに対し、animate は **時間軸を持つ説明**（対比の展開・処理の流れ・状態の変化）を担う。
+Remotion（React ベースの動画フレームワーク）で、各 Section の解説動画（3〜6 分、1080p mp4）を生成・挿入する。
+静止画の `/illustrate` が「直感的なメンタルモデル 1 枚」を担うのに対し、animate は **Section を理解するための主たる学習路**（時間軸を持つ解説。対比の展開・処理の流れ・状態の変化）を担う。**動画を見れば Section の内容が理解でき、テキストは補助**（細部の確認・コピペ・読み返し）として使う想定。
 
-**基本方針**: 「概念」種別の Section に 1 本ずつ生成する（密度は `references/criteria.md` の方針設定に従う）。配置は **Section タイトル直後**（📝 前提知識の行・グループ全体像があればその後、🎯 の前）。学習の最初に視聴する想定。再実行しても生成済み Section はスキップする（冪等）。
+**基本方針**: 「概念」種別の Section に 1 本ずつ生成する（密度は `references/criteria.md` の方針設定に従う）。配置は **Section タイトル直後**（📝 前提知識の行・グループ全体像があればその後、🎯 の前）。学習の最初に視聴する主経路（要約・予告編ではなく、見れば Section を理解できる解説。設計基準は `references/criteria.md`）。再実行しても生成済み Section はスキップする（冪等）。
 
 ## 対象範囲
 
@@ -26,7 +26,7 @@ Remotion（React ベースの動画フレームワーク）で、各 Section の
    - `video/src/theme.ts` の primary / accent を教材サイトのテーマカラーに合わせる
    - `video/data/voice.json` の stylePrompt を writing.md のメンター人格に合わせる
    - `video/data/pronunciation.json` に題材のドメイン用語を追加する
-5. ⚠️ **Remotion ライセンス**: 評価・PoC は無償だが、**動画を量産して教材として公開する時点で Company License（従業員 4 名以上の企業は必須、Creators $25/席/月・最低 3 席）が必要**。配信・挿入フェーズに進む前にライセンス状態を確認し、未取得なら停止してユーザーに確認する
+5. 📝 **Remotion ライセンス**: Remotion は一定規模の企業利用で Company License が必要になるが、**本プロジェクトはライセンス判断をプロジェクトオーナーの責任で進める方針**のため、生成・配信・挿入を止めるゲートは設けない（必要があればオーナーが別途手配する）。
 
 ## 使い方
 
@@ -60,7 +60,7 @@ Remotion（React ベースの動画フレームワーク）で、各 Section の
 4. **TTS**: `cd video && node scripts/tts-gemini.mjs <sectionId>`（生成済み wav は再利用される）
 5. **レンダリング**: `npx remotion render src/index.ts SectionVideo out/<sectionId>.mp4 --props=data/<sectionId>.props.json`（1 本あたり約 6 分）
 6. **QA**: 各シーンの中間フレームを `npx remotion still src/index.ts SectionVideo out/qa-<frame>.png --frame=<N> --props=... --scale=0.5` で 3〜4 枚書き出し、Read で目視確認（文字切れ・レイアウト崩れ・字幕）。音声も冒頭シーンを試聴確認する
-7. **配信と挿入**（ライセンス確認後のフェーズ）:
+7. **配信と挿入**:
    - `gh release upload videos out/<sectionId>.mp4 --clobber`（初回は `gh release create videos --title "Section 解説動画" --notes "教材の Section 解説動画アセット"`）
    - Section タイトル直後に下記テンプレートで挿入する
 

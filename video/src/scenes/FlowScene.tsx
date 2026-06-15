@@ -8,14 +8,14 @@ const StepBox = ({ step }: { step: FlowStep }) => (
   <div
     style={{
       background: theme.panel,
-      border: `2.5px solid ${step.emphasis ? theme.accent : theme.panelBorder}`,
+      border: `2px solid ${step.emphasis ? theme.accent : theme.panelBorder}`,
       borderRadius: 16,
       padding: "26px 36px",
       textAlign: "center",
       minWidth: 200,
       boxShadow: step.emphasis
-        ? "0 0 0 6px rgba(237,139,0,0.12), 0 16px 38px rgba(16,42,56,0.12)"
-        : theme.shadow,
+        ? `0 0 0 6px ${theme.accentSoft}, ${theme.shadow}`
+        : `${theme.shadow}, ${theme.topHighlight}`,
     }}
   >
     <div
@@ -23,7 +23,7 @@ const StepBox = ({ step }: { step: FlowStep }) => (
         fontFamily: theme.fontMono,
         fontSize: 36,
         fontWeight: 700,
-        color: step.emphasis ? theme.accent : theme.text,
+        color: step.emphasis ? theme.accentDeep : theme.text,
       }}
     >
       {step.label}
@@ -121,7 +121,7 @@ export const FlowScene = ({ scene }: { scene: FlowSceneType }) => {
                     fontSize: 28,
                     color: theme.text,
                     marginLeft: 8,
-                    boxShadow: "0 10px 26px rgba(16,42,56,0.08)",
+                    boxShadow: theme.shadowSoft,
                   }}
                 >
                   {os.label}
@@ -151,9 +151,9 @@ export const FlowScene = ({ scene }: { scene: FlowSceneType }) => {
               padding: "18px 44px",
               fontSize: 38,
               fontWeight: 700,
-              color: theme.accent,
-              background: "rgba(237,139,0,0.08)",
-              boxShadow: "0 14px 36px rgba(237,139,0,0.18)",
+              color: theme.accentDeep,
+              background: theme.accentSoft,
+              boxShadow: theme.shadow,
             }}
           >
             {scene.tagline}

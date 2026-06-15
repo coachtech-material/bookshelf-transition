@@ -3,9 +3,8 @@
 教材の各 Section から「解説スライド + ナレーション + 字幕」の mp4 を生成する Remotion ワークスペース。
 使い方の全体は `.claude/skills/animate/SKILL.md` を参照。
 
-> ⚠️ **Remotion ライセンス**: 従業員 4 名以上の企業での利用は Company License が必要です。
-> 評価（PoC）は無償ですが、「技術スタックに組み込む決定」をした時点で課金対象になります。
-> 量産・公開の前に [remotion.pro](https://www.remotion.pro/license) でライセンスを取得してください。
+> 📝 **Remotion ライセンス**: Remotion は一定規模の企業利用で Company License が必要になります。
+> 本プロジェクトはライセンス判断をプロジェクトオーナーの責任で進める方針です（詳細は [remotion.pro](https://www.remotion.pro/license)）。
 
 ## パイプライン
 
