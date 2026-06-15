@@ -49,16 +49,20 @@ const SceneContent = ({
   }
 };
 
-/** 背景の奥行きレイヤー: 淡い色味のオーブ + ごく薄いドットグリッド */
+/**
+ * 背景の奥行きレイヤー（マット・つや消し）。
+ * 大きな発光オーブは使わず、紙の微粒子テクスチャ + 角のごく淡い色味で
+ * 「マットで立体感のある下地」を作る。
+ */
 const Backdrop = () => {
   const frame = useCurrentFrame();
-  const orb = (
+  // 角に置く淡い色味（発光ではなく「色のニュアンス」。ごくゆっくり漂う）
+  const wash = (
     color: string,
     size: number,
     cx: number,
     cy: number,
     k: number,
-    opacity: number,
   ) => (
     <div
       style={{
@@ -66,23 +70,21 @@ const Backdrop = () => {
         width: size,
         height: size,
         borderRadius: "50%",
-        background: color,
-        filter: "blur(130px)",
-        opacity,
-        left: cx + Math.sin(frame / (120 * k)) * 60,
-        top: cy + Math.cos(frame / (150 * k)) * 44,
+        background: `radial-gradient(circle, ${color} 0%, transparent 68%)`,
+        left: cx + Math.sin(frame / (260 * k)) * 26,
+        top: cy + Math.cos(frame / (320 * k)) * 20,
       }}
     />
   );
   return (
     <AbsoluteFill>
-      {orb("#BFE5F2", 760, 1150, -220, 1, 0.5)}
-      {orb("#FFE2BD", 560, -160, 640, 1.4, 0.4)}
+      {wash("rgba(59,130,246,0.06)", 1100, 1080, -360, 1)}
+      {wash("rgba(249,115,22,0.055)", 980, -320, 600, 1.3)}
+      {/* 紙の微粒子（中立グレーの細かいドット）。マットな質感の核 */}
       <AbsoluteFill
         style={{
-          backgroundImage:
-            "radial-gradient(rgba(0,115,150,0.08) 1.4px, transparent 1.4px)",
-          backgroundSize: "34px 34px",
+          backgroundImage: `radial-gradient(${theme.grain} 1px, transparent 1px)`,
+          backgroundSize: "26px 26px",
         }}
       />
     </AbsoluteFill>
@@ -98,9 +100,10 @@ const ProgressBar = () => {
         position: "absolute",
         top: 0,
         left: 0,
-        height: 7,
+        height: 5,
         width: (frame / durationInFrames) * width,
-        background: `linear-gradient(90deg, ${theme.primaryDeep}, ${theme.accent})`,
+        background: `linear-gradient(90deg, ${theme.primary}, ${theme.accent})`,
+        opacity: 0.9,
       }}
     />
   );

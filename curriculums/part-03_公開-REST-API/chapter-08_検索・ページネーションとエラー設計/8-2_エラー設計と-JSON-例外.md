@@ -96,11 +96,11 @@ public function destroy(Task $task)
 
 `errors` のキーが項目名、値がその項目のエラーメッセージの配列です。日本語のメッセージは、FormRequest の `messages()` で定義したものがそのまま出ます。利用側は `errors` を見て、どの項目が不正だったかを画面に出せます。
 
-📝 この 422 の JSON は、リクエストが「JSON を期待している」とき（`Accept: application/json` ヘッダーが付いているとき、または `api/*` のパスのとき）に返ります。API の利用側は `Accept: application/json` を付けてリクエストするのが基本です。
+📝 この 422 の JSON は、リクエストが「JSON を期待している」とき、つまり `Accept: application/json` ヘッダーが付いているときに返ります。これがないと、検証失敗時には JSON ではなくリダイレクトが返ります（URL が `api/*` でも同じです）。API の利用側は `Accept: application/json` を付けてリクエストするのが基本です。
 
 ## 見つからないときは Handler で JSON の 404 を返す
 
-7-1 で見たとおり、`show(Task $task)` のような暗黙のルートモデルバインディングでは、URL の ID に対応するタスクが無いと `ModelNotFoundException` が投げられます。このとき Laravel が既定で返す JSON は、`No query results for model [App\Models\Task] 1` のように **内部のクラス名が漏れた素っ気ないメッセージ** です。
+7-1 で見たとおり、`show(Task $task)` のような暗黙のルートモデルバインディングでは、URL の ID に対応するタスクが無いと `ModelNotFoundException` が投げられます。このとき Laravel が既定で返す JSON は、開発環境では `No query results for model [App\Models\Task] 1` のように **内部のクラス名が漏れた素っ気ないメッセージ** です（本番環境ではこの詳細は隠されます）。
 
 公開 API としては、`{"error": "タスクが見つかりませんでした。"}` のような統一された親切なメッセージを返したいところです。こうしたアプリ全体に関わる例外処理は、`app/Exceptions/Handler.php` の `render` メソッドで上書きします。
 

@@ -2,7 +2,7 @@
 
 📝 **このハンズオンで使う機能**: Laravel Sail（2-1 Laravel Sail で環境構築する で学習）、日本語ロケール（2-3 ハンズオン: Laravel Sail プロジェクトを立ち上げる で学習）
 
-📝 **前提知識**: このセクションは 2-1 Laravel Sail で環境構築する と 2-3 ハンズオン: Laravel Sail プロジェクトを立ち上げる の内容を前提としています。
+📝 **前提知識**: このセクションは 2-1 Laravel Sail で環境構築する の内容を前提としています。
 
 ## 🎯 このセクションで学ぶこと
 
@@ -110,10 +110,10 @@ cp .env.example .env
             - mysql
 ```
 
-続けて `.env` を開き、データベース接続情報が次のようになっていることを確認します（`sail:install` が設定します。異なる場合はこの内容に合わせてください）。
+続けて `.env` を開き、データベース接続情報を次のように **編集します**。`sail:install` は `DB_HOST` を `mysql` に変えますが、ユーザー名・パスワード・データベース名は初期値（`.env.example` 由来で、それぞれ `root` / 空 / `laravel`）のままです。Sail の MySQL コンテナに合わせて、次の値に設定します。
 
 ```ini
-# .env （データベース接続情報を確認する）
+# .env （データベース接続情報を編集する）
 DB_CONNECTION=mysql
 DB_HOST=mysql
 DB_PORT=3306
@@ -122,7 +122,7 @@ DB_USERNAME=sail
 DB_PASSWORD=password
 ```
 
-🔑 `DB_HOST` はコンテナ名の `mysql` を指定します（`localhost` ではありません）。`DB_DATABASE` は、`sail:install` が付ける既定値（プロジェクト名に由来する `task_app`）のままで構いません。
+🔑 `DB_HOST` はコンテナ名の `mysql` を指定します（`localhost` ではありません）。`DB_USERNAME` / `DB_PASSWORD` は Sail の MySQL コンテナが作るユーザー（`sail` / `password`）に合わせ、`DB_DATABASE` はこのアプリ用に `task_app` とします。これらの値は `compose.yaml` の MySQL サービス（`MYSQL_DATABASE` など）に渡され、コンテナの初回起動時にデータベースとユーザーが作られます。
 
 ### 🏃 Step 3: コンテナを起動し、アプリケーションキーを生成する
 
@@ -162,8 +162,8 @@ touch lang/ja/auth.php
 <summary>lang/ja/validation.php の全体（クリックで展開）</summary>
 
 ```php
-// lang/ja/validation.php
 <?php
+// lang/ja/validation.php
 
 return [
     'required' => ':attributeは必須です。',
@@ -208,8 +208,8 @@ return [
 `lang/ja/auth.php` を、ログイン失敗時のメッセージを含む内容で編集します。
 
 ```php
-// lang/ja/auth.php
 <?php
+// lang/ja/auth.php
 
 return [
     'failed' => 'ログイン情報が登録されていません。',
@@ -285,11 +285,10 @@ export default {
 画面の URL を `routes/web.php` に定義します。内容を次のように **まるごと書き換えます**。トップページ（`/`）以外は、すべてログイン必須（`auth` ミドルウェア）のグループにまとめます。
 
 ```php
-// routes/web.php
 <?php
+// routes/web.php
 
 use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\RankingController;
 use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
@@ -303,8 +302,6 @@ Route::get('/', function () {
 Route::middleware('auth')->group(function () {
     Route::resource('categories', CategoryController::class)->except(['show']);
     Route::resource('tasks', TaskController::class);
-    Route::post('/tasks/{task}/favorite', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
-    Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
     Route::get('/ranking', [RankingController::class, 'index'])->name('ranking.index');
 });
 ```
@@ -319,7 +316,7 @@ Route::middleware('auth')->group(function () {
 
 ```bash
 # task-app ディレクトリで実行
-mkdir -p resources/views/layouts resources/views/auth resources/views/tasks resources/views/categories resources/views/favorites resources/views/ranking
+mkdir -p resources/views/layouts resources/views/auth resources/views/tasks resources/views/categories resources/views/ranking
 touch resources/views/layouts/app.blade.php
 touch resources/views/auth/login.blade.php
 touch resources/views/auth/register.blade.php
@@ -330,7 +327,6 @@ touch resources/views/tasks/show.blade.php
 touch resources/views/categories/index.blade.php
 touch resources/views/categories/create.blade.php
 touch resources/views/categories/edit.blade.php
-touch resources/views/favorites/index.blade.php
 touch resources/views/ranking/index.blade.php
 ```
 
@@ -363,7 +359,6 @@ touch resources/views/ranking/index.blade.php
                 @auth
                     <a href="{{ route('tasks.index') }}" class="text-gray-700 hover:text-indigo-600">タスク一覧</a>
                     <a href="{{ route('categories.index') }}" class="text-gray-700 hover:text-indigo-600">カテゴリ</a>
-                    <a href="{{ route('favorites.index') }}" class="text-gray-700 hover:text-indigo-600">お気に入り</a>
                     <a href="{{ route('ranking.index') }}" class="text-gray-700 hover:text-indigo-600">ランキング</a>
                     <span class="text-gray-500">{{ Auth::user()->name }}</span>
                     <form action="{{ route('logout') }}" method="POST" class="inline">
@@ -416,14 +411,21 @@ touch resources/views/ranking/index.blade.php
 <body class="bg-gray-100 text-gray-900 antialiased">
     <div class="min-h-screen flex flex-col items-center justify-center px-4 text-center">
         <h1 class="text-3xl font-bold text-indigo-600 mb-2">タスク管理アプリ</h1>
-        <p class="text-gray-600 mb-8">タスクを分類・タグ付けし、お気に入りやランキングで整理できます。</p>
+        <p class="text-gray-600 mb-8">タスクを分類・タグ付けし、ランキングで利用状況を整理できます。</p>
         @guest
             <div class="flex gap-4">
                 <a href="/login" class="rounded-md bg-indigo-600 px-6 py-2 text-white hover:bg-indigo-700">ログイン</a>
                 <a href="/register" class="rounded-md border border-gray-300 bg-white px-6 py-2 text-gray-700 hover:bg-gray-50">会員登録</a>
             </div>
         @else
-            <a href="{{ route('tasks.index') }}" class="rounded-md bg-indigo-600 px-6 py-2 text-white hover:bg-indigo-700">タスク一覧へ</a>
+            <p class="mb-4 text-gray-700">{{ Auth::user()->name }} さん、ログイン中です。</p>
+            <div class="flex gap-4">
+                <a href="{{ route('tasks.index') }}" class="rounded-md bg-indigo-600 px-6 py-2 text-white hover:bg-indigo-700">タスク一覧へ</a>
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="rounded-md border border-gray-300 bg-white px-6 py-2 text-gray-700 hover:bg-gray-50">ログアウト</button>
+                </form>
+            </div>
         @endguest
     </div>
 </body>
@@ -761,7 +763,7 @@ touch resources/views/ranking/index.blade.php
 
 </details>
 
-`resources/views/tasks/show.blade.php` には、お気に入りのトグルボタンと、編集・削除ボタンがあります。編集・削除ボタンは、いまは誰にでも表示されます。所有者だけに表示する制御（`@can`）は、10-1 で追加します。
+`resources/views/tasks/show.blade.php` には、タスクの詳細と、編集・削除ボタンがあります。編集・削除ボタンは、いまは誰にでも表示されます。所有者だけに表示する制御（`@can`）は、10-1 で追加します。
 
 <details>
 <summary>resources/views/tasks/show.blade.php の全体（クリックで展開）</summary>
@@ -774,19 +776,7 @@ touch resources/views/ranking/index.blade.php
 @section('content')
 <div class="max-w-2xl mx-auto">
     <div class="bg-white rounded-lg shadow p-6">
-        <div class="flex items-start justify-between">
-            <h1 class="text-2xl font-bold">{{ $task->title }}</h1>
-
-            {{-- お気に入りトグル --}}
-            <form action="{{ route('favorites.toggle', $task) }}" method="POST">
-                @csrf
-                @if (Auth::user()->favoriteTasks->contains($task->id))
-                    <button type="submit" class="text-red-500 hover:text-red-700" title="お気に入りから外す">♥ お気に入り中</button>
-                @else
-                    <button type="submit" class="text-gray-400 hover:text-red-500" title="お気に入りに追加">♡ お気に入り</button>
-                @endif
-            </form>
-        </div>
+        <h1 class="text-2xl font-bold">{{ $task->title }}</h1>
 
         <dl class="mt-4 space-y-2 text-sm">
             <div class="flex"><dt class="w-24 text-gray-500">カテゴリ</dt><dd>{{ $task->category->name }}</dd></div>
@@ -947,52 +937,9 @@ touch resources/views/ranking/index.blade.php
 
 </details>
 
-**お気に入り・ランキングの画面**
+**ランキングの画面**
 
-`resources/views/favorites/index.blade.php` はお気に入りタスクの一覧、`resources/views/ranking/index.blade.php` はお気に入りの多い順のランキングです。ランキングの集計（`favorites_count`）は 10-2 で実装します。
-
-<details>
-<summary>resources/views/favorites/index.blade.php の全体（クリックで展開）</summary>
-
-```blade
-{{-- resources/views/favorites/index.blade.php --}}
-@extends('layouts.app')
-@section('title', 'お気に入り')
-
-@section('content')
-<h1 class="text-2xl font-bold mb-6">お気に入り</h1>
-
-@if ($tasks->isEmpty())
-    <p class="text-gray-500">お気に入りのタスクはありません。</p>
-@else
-    <div class="bg-white rounded-lg shadow overflow-hidden">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th class="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">タイトル</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">カテゴリ</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200">
-                @foreach ($tasks as $task)
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-3">
-                            <a href="{{ route('tasks.show', $task) }}" class="text-indigo-600 hover:underline">{{ $task->title }}</a>
-                        </td>
-                        <td class="px-4 py-3 text-sm text-gray-700">{{ $task->category->name }}</td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-    <div class="mt-4">
-        {{ $tasks->links() }}
-    </div>
-@endif
-@endsection
-```
-
-</details>
+`resources/views/ranking/index.blade.php` は、よく使われているタグを、付けられたタスク数の多い順に並べるランキングです。ランキングの集計（`tasks_count`）は 10-2 で実装します。
 
 <details>
 <summary>resources/views/ranking/index.blade.php の全体（クリックで展開）</summary>
@@ -1003,22 +950,19 @@ touch resources/views/ranking/index.blade.php
 @section('title', 'ランキング')
 
 @section('content')
-<h1 class="text-2xl font-bold mb-6">お気に入りランキング</h1>
+<h1 class="text-2xl font-bold mb-6">人気のタグ</h1>
 
-@if ($rankedTasks->isEmpty())
-    <p class="text-gray-500">まだお気に入りされたタスクがありません。</p>
+@if ($rankedTags->isEmpty())
+    <p class="text-gray-500">まだタグの付いたタスクがありません。</p>
 @else
     <ol class="space-y-3">
-        @foreach ($rankedTasks as $index => $task)
+        @foreach ($rankedTags as $index => $tag)
             <li class="flex items-center justify-between rounded-lg bg-white p-4 shadow">
                 <div class="flex items-center gap-4">
                     <span class="w-8 text-center text-xl font-bold text-indigo-600">{{ $index + 1 }}</span>
-                    <div>
-                        <a href="{{ route('tasks.show', $task) }}" class="font-semibold text-indigo-600 hover:underline">{{ $task->title }}</a>
-                        <p class="text-sm text-gray-500">{{ $task->category->name }}</p>
-                    </div>
+                    <span class="font-semibold text-gray-800">{{ $tag->name }}</span>
                 </div>
-                <span class="text-sm text-gray-700">♥ {{ $task->favorites_count }}</span>
+                <span class="text-sm text-gray-700">{{ $tag->tasks_count }} 件のタスク</span>
             </li>
         @endforeach
     </ol>
@@ -1059,7 +1003,7 @@ sail npm run dev
 - [ ] `sail up -d`・`key:generate` で起動できた（`sail ps` で 3 つが `running`）
 - [ ] `config/app.php` の `locale` を `ja` にし、`lang/ja/validation.php`・`lang/ja/auth.php` を配置した
 - [ ] Tailwind CSS を導入し、`tailwind.config.js`・`postcss.config.js`・`app.css` を設定した
-- [ ] `routes/web.php` と Blade アセット一式（13 ファイル）を配置した
+- [ ] `routes/web.php` と Blade アセット一式（12 ファイル）を配置した
 - [ ] `sail npm run dev` を起動し、`http://localhost` でスタイルの当たったトップページが表示できた
 
 ---
@@ -1073,4 +1017,4 @@ sail npm run dev
 
 ---
 
-次のセクションでは、9-1 で設計したテーブルとモデルを作ります。`users`・`categories`・`tasks`・`tags`・`task_tag`・`favorites` のマイグレーションを作成し、外部キー制約と ON DELETE CASCADE（タスク削除で `task_tag`・`favorites` も自動削除）を設定します。モデルには 1 対多・多対多のリレーションと `$fillable` / `$casts` を定義し、`migrate:fresh --seed` で初期データを投入できるよう、シーダーとファクトリも用意します。
+次のセクションでは、9-1 で設計したテーブルとモデルを作ります。`users`・`categories`・`tasks`・`tags`・`task_tag` のマイグレーションを作成し、外部キー制約と ON DELETE CASCADE（タスク削除で `task_tag` も自動削除）を設定します。モデルには 1 対多・多対多のリレーションと `$fillable` / `$casts` を定義し、`migrate:fresh --seed` で初期データを投入できるよう、シーダーとファクトリも用意します。

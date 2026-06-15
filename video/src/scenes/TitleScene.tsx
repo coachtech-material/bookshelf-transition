@@ -24,9 +24,11 @@ export const TitleScene = ({
       <div style={{ ...springIn(frame, fps, 4), marginBottom: 36 }}>
         <span
           style={{
-            border: `2px solid ${theme.panelBorder}`,
+            border: `1px solid ${theme.hairline}`,
+            background: theme.panel,
+            boxShadow: `${theme.shadowSoft}, ${theme.topHighlight}`,
             borderRadius: 999,
-            padding: "10px 30px",
+            padding: "11px 32px",
             fontSize: 30,
             color: theme.dim,
             letterSpacing: 1,
@@ -50,7 +52,7 @@ export const TitleScene = ({
             fontSize: 64,
             fontWeight: 700,
             color: theme.accent,
-            textShadow: "0 6px 26px rgba(237,139,0,0.3)",
+            textShadow: "0 6px 24px rgba(249,115,22,0.28)",
           }}
         >
           {scene.sectionNo}

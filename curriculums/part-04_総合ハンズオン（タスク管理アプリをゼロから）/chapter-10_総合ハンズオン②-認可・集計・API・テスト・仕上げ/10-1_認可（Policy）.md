@@ -4,18 +4,18 @@
 
 📝 **前提知識**: このセクションは 4-2 Policy の作成・登録・適用 と 9-5 CRUD（カテゴリ・タスク）と多対多操作 の内容を前提としています。
 
-Chapter 10 では、9 章で作ったタスク管理アプリに、認可・集計・公開 API・自動テストを積み上げ、提出できる品質に仕上げます。
+Chapter 10 では、9 章で作ったタスク管理アプリに、認可・集計・公開 API・自動テストを積み上げ、完成度の高い状態に仕上げます。
 
 | セクション | テーマ | 種類 |
 |---|---|---|
 | 10-1 認可（Policy） | 所有者だけが編集・削除できるようにする | ハンズオン |
-| 10-2 集計機能 | タスク数・お気に入り数・ランキング | ハンズオン |
+| 10-2 集計機能 | カテゴリ別タスク数・人気タグ・ランキング | ハンズオン |
 | 10-3 公開 API | 公開 REST API を実装する | ハンズオン |
 | 10-4 自動テスト | Feature / Unit テストとカバレッジ | ハンズオン |
-| 10-5 仕上げ（Pint・README・Issue 駆動の振り返り・提出前チェック） | 提出前の仕上げ | ハンズオン |
+| 10-5 仕上げ（Pint・README・Issue 駆動の振り返り・最終チェック） | 仕上げと最終確認 | ハンズオン |
 | 10-6 まとめ：身につけた力と次のステップ | 教材全体の振り返り | 概念 |
 
-📖 **この Chapter の進め方**: 10-1 で所有者ベースの認可、10-2 で集計とランキングを実装します。10-3 で公開 API を加え、10-4 で全体の自動テストを書いてカバレッジを確認します。最後に 10-5 で提出前の仕上げを行い、10-6 で教材全体を振り返ります。
+📖 **この Chapter の進め方**: 10-1 で所有者ベースの認可、10-2 で集計とランキングを実装します。10-3 で公開 API を加え、10-4 で全体の自動テストを書いてカバレッジを確認します。最後に 10-5 で仕上げを行い、10-6 で教材全体を振り返ります。
 
 ## 🎯 このセクションで学ぶこと
 
@@ -61,8 +61,8 @@ sail artisan make:policy TaskPolicy --model=Task
 `app/Policies/TaskPolicy.php` が生成されます。`viewAny` / `view` / `create` などのメソッドが空の状態で並んでいるので、内容を次のように **まるごと書き換えます**。今回使うのは、所有者チェックを行う `update` と `delete` の 2 つです。
 
 ```php
-// app/Policies/TaskPolicy.php
 <?php
+// app/Policies/TaskPolicy.php
 
 namespace App\Policies;
 
@@ -90,8 +90,8 @@ class TaskPolicy
 `Task` と `TaskPolicy` の対応を登録します。`app/Providers/AuthServiceProvider.php` を開き、内容を次のように **まるごと書き換えます** （`use` を 2 つ加え、`$policies` 配列に対応を登録しています）。
 
 ```php
-// app/Providers/AuthServiceProvider.php
 <?php
+// app/Providers/AuthServiceProvider.php
 
 namespace App\Providers;
 
@@ -245,4 +245,4 @@ http://localhost/tasks/4/edit
 
 ---
 
-次のセクションでは、集計機能を実装します。タスクのお気に入り数（`withCount`）を詳細画面に表示し、お気に入りの多い順のランキングを作ります。一覧では `with` / `withCount`、詳細では `load` / `loadCount` を使い分けて N+1 を避けます。9-5 でカテゴリ一覧に使った `withCount('tasks')`（カテゴリ別タスク数）も、同じ集計の仲間として整理します。
+次のセクションでは、集計機能を実装します。よく使われているタグのランキングを `withCount` + `orderByDesc` で作り、タスクの詳細画面には所属カテゴリのタスク数を `loadCount` で表示します。一覧では `with` / `withCount`、詳細では `load` / `loadCount` を使い分けて N+1 を避けます。9-5 でカテゴリ一覧に使った `withCount('tasks')`（カテゴリ別タスク数）も、同じ集計の仲間として整理します。

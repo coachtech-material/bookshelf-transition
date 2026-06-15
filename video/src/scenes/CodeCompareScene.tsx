@@ -120,7 +120,7 @@ const Pane = ({
           borderRadius: "0 14px 14px 14px",
           padding: "34px 38px",
           minHeight: 220,
-          boxShadow: "0 22px 50px rgba(16,42,56,0.22)",
+          boxShadow: theme.shadowLift,
         }}
       >
         {pane.lines.map((line, i) => (

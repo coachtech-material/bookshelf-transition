@@ -119,7 +119,7 @@ public function show(Task $task)
 }
 ```
 
-自分で `Task::find($id)` を書く必要がなく、しかも該当する ID が存在しなければ自動で例外（`ModelNotFoundException`）が投げられます。この仕組みは Web ルートでも API ルートでも同じです。存在しない ID にアクセスしたときの応答（API なら JSON の 404）をどう設計するかは、8-2 で扱います。
+自分で `Task::find($id)` を書く必要がなく、しかも該当する ID が存在しなければ、モデルが見つからないときの例外（`ModelNotFoundException`）が自動で投げられます。この仕組みは Web ルートでも API ルートでも同じです。存在しない ID にアクセスしたときの応答（API なら JSON の 404）をどう設計するかは、8-2 で扱います。
 
 ## バージョニングで API を分ける
 

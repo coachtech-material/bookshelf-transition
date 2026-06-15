@@ -41,7 +41,7 @@ export const OutroScene = ({ scene }: { scene: OutroSceneType }) => {
                 background: theme.accent,
                 borderRadius: 4,
                 flexShrink: 0,
-                boxShadow: "0 0 0 5px rgba(237,139,0,0.14)",
+                boxShadow: `0 0 0 5px ${theme.accentSoft}`,
               }}
             />
             <div style={{ fontSize: 40, lineHeight: 1.6, color: theme.text }}>

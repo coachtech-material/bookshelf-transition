@@ -34,12 +34,13 @@ export const springIn = (
   const s = spring({
     frame: f,
     fps,
-    config: { damping: 13, stiffness: 130, mass: 0.7 },
+    // 大人・落ち着いた所作にするため damping を上げ、オーバーシュートを抑える
+    config: { damping: 16, stiffness: 120, mass: 0.8 },
   });
-  const opacity = interpolate(f, [0, 9], [0, 1], clamp);
+  const opacity = interpolate(f, [0, 10], [0, 1], clamp);
   return {
     opacity,
-    transform: `translateY(${(1 - s) * 40}px) scale(${0.94 + 0.06 * s})`,
+    transform: `translateY(${(1 - s) * 30}px) scale(${0.965 + 0.035 * s})`,
   };
 };
 

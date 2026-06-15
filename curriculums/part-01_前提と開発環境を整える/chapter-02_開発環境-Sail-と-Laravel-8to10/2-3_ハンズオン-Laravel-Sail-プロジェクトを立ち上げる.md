@@ -180,8 +180,8 @@ touch lang/ja/validation.php
 作成した `lang/ja/validation.php` を、次の内容で編集します。
 
 ```php
-// lang/ja/validation.php
 <?php
+// lang/ja/validation.php
 
 return [
     'required' => ':attributeを入力してください。',

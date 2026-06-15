@@ -21,7 +21,7 @@ export const NestScene = ({ scene }: { scene: NestSceneType }) => {
   const { fps } = useVideoConfig();
   const audioFrames = scene.audioFrames ?? 400;
   const appearAt = [0.04, 0.34, 0.6].map((f) => Math.round(audioFrames * f));
-  const colors = [theme.accent, theme.primary, "#7E9AA8"];
+  const colors = [theme.accent, theme.primary, "#8C9099"];
 
   return (
     <AbsoluteFill style={{ fontFamily: theme.fontJa }}>
@@ -54,8 +54,10 @@ export const NestScene = ({ scene }: { scene: NestSceneType }) => {
               opacity,
               border: `3px solid ${colors[i]}`,
               borderRadius: 22,
-              background: isInner ? "rgba(237,139,0,0.07)" : "rgba(255,255,255,0.55)",
-              boxShadow: isInner ? "0 0 0 8px rgba(237,139,0,0.1)" : "none",
+              background: isInner ? theme.accentSoft : "rgba(255,255,255,0.66)",
+              boxShadow: isInner
+                ? `0 0 0 8px ${theme.accentSoft}, ${theme.shadow}`
+                : theme.shadowSoft,
               display: "flex",
               flexDirection: "column",
               justifyContent: isInner ? "center" : "flex-start",

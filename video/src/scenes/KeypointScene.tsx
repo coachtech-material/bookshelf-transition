@@ -9,6 +9,7 @@ export const KeypointScene = ({ scene }: { scene: KeypointSceneType }) => {
   const { fps } = useVideoConfig();
   const audioFrames = scene.audioFrames ?? 300;
   const accents = [theme.primary, theme.accent];
+  const accentsDeep = [theme.primaryDeep, theme.accentDeep];
 
   return (
     <AbsoluteFill style={{ fontFamily: theme.fontJa }}>
@@ -33,18 +34,19 @@ export const KeypointScene = ({ scene }: { scene: KeypointSceneType }) => {
               ...springIn(frame, fps, 10 + i * Math.round(audioFrames * 0.3)),
               width: 660,
               background: theme.panel,
-              border: `2px solid ${accents[i % accents.length]}`,
+              border: `1px solid ${theme.hairline}`,
+              borderTop: `5px solid ${accents[i % accents.length]}`,
               borderRadius: 20,
-              padding: "54px 56px",
-              boxShadow: theme.shadow,
+              padding: "48px 54px 54px",
+              boxShadow: `${theme.shadowLift}, ${theme.topHighlight}`,
             }}
           >
             <div
               style={{
                 fontSize: 46,
                 fontWeight: 700,
-                color: accents[i % accents.length],
-                marginBottom: 28,
+                color: accentsDeep[i % accentsDeep.length],
+                marginBottom: 26,
               }}
             >
               {card.title}

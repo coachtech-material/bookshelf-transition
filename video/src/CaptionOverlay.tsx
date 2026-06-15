@@ -100,19 +100,21 @@ export const CaptionOverlay = ({
       <div
         style={{
           maxWidth: 1560,
-          background: "rgba(13,33,44,0.92)",
+          background: theme.captionBg,
           borderLeft: `6px solid ${theme.accent}`,
-          borderRadius: 10,
-          padding: "16px 34px",
-          fontSize: 38,
+          borderRadius: 12,
+          padding: "18px 38px",
+          fontSize: 39,
+          fontWeight: 500,
+          letterSpacing: 0.3,
           lineHeight: 1.5,
           fontFamily: theme.fontJa,
-          boxShadow: "0 12px 34px rgba(16,42,56,0.22)",
+          boxShadow: "0 18px 44px rgba(19,23,33,0.28)",
           opacity,
         }}
       >
         <span style={{ color: "#FFFFFF" }}>{current.text.slice(0, revealed)}</span>
-        <span style={{ color: "rgba(255,255,255,0.42)" }}>
+        <span style={{ color: "rgba(255,255,255,0.40)" }}>
           {current.text.slice(revealed)}
         </span>
       </div>

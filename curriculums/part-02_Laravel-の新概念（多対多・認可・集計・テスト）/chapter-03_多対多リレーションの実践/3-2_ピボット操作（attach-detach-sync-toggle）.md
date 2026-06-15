@@ -129,8 +129,8 @@ sail artisan make:model Tag -m
 生成された `tags` テーブルのマイグレーションを開き、内容を次のように **まるごと書き換えます** （`name` 列を加えるだけです）。
 
 ```php
-// database/migrations/xxxx_xx_xx_xxxxxx_create_tags_table.php
 <?php
+// database/migrations/xxxx_xx_xx_xxxxxx_create_tags_table.php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -164,8 +164,8 @@ sail artisan make:migration create_tag_user_table
 生成されたファイルを、3-1 で学んだ純粋なピボット（複合主キー）の形に **まるごと書き換えます**。
 
 ```php
-// database/migrations/xxxx_xx_xx_xxxxxx_create_tag_user_table.php
 <?php
+// database/migrations/xxxx_xx_xx_xxxxxx_create_tag_user_table.php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -235,8 +235,8 @@ class Tag extends Model
 次に `User` モデル（`app/Models/User.php`）に `tags()` の関連を加えます。サンドボックスの `User` は標準のままなので、内容を次のように **まるごと書き換えます** （`BelongsToMany` の取り込みと `tags()` メソッドを加えています）。
 
 ```php
-// app/Models/User.php
 <?php
+// app/Models/User.php
 
 namespace App\Models;
 

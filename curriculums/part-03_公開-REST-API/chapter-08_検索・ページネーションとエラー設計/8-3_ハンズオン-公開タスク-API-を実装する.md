@@ -86,8 +86,8 @@ sail artisan make:resource Api/V1/TaskResource
 `app/Http/Resources/Api/V1/TaskResource.php` ができます。中身を次のように **まるごと書き換えます**。タスクのうち、外部に見せたいフィールドだけを並べ、内部のタイムスタンプ（`created_at` など）は出しません。
 
 ```php
-// app/Http/Resources/Api/V1/TaskResource.php
 <?php
+// app/Http/Resources/Api/V1/TaskResource.php
 
 namespace App\Http\Resources\Api\V1;
 
@@ -125,8 +125,8 @@ sail artisan make:request Api/V1/UpdateTaskRequest
 一覧用の `IndexTaskRequest` は、クエリパラメータ（キーワード・ステータス・ページ・件数）を検証します。`app/Http/Requests/Api/V1/IndexTaskRequest.php` を次のように書き換えます。
 
 ```php
-// app/Http/Requests/Api/V1/IndexTaskRequest.php
 <?php
+// app/Http/Requests/Api/V1/IndexTaskRequest.php
 
 namespace App\Http\Requests\Api\V1;
 
@@ -169,8 +169,8 @@ class IndexTaskRequest extends FormRequest
 <summary>StoreTaskRequest.php の全体（クリックで展開）</summary>
 
 ```php
-// app/Http/Requests/Api/V1/StoreTaskRequest.php
 <?php
+// app/Http/Requests/Api/V1/StoreTaskRequest.php
 
 namespace App\Http\Requests\Api\V1;
 
@@ -220,8 +220,8 @@ class StoreTaskRequest extends FormRequest
 <summary>UpdateTaskRequest.php の全体（クリックで展開）</summary>
 
 ```php
-// app/Http/Requests/Api/V1/UpdateTaskRequest.php
 <?php
+// app/Http/Requests/Api/V1/UpdateTaskRequest.php
 
 namespace App\Http\Requests\Api\V1;
 
@@ -280,8 +280,8 @@ sail artisan make:controller Api/V1/TaskController --api --model=Task
 <summary>TaskController.php の全体（クリックで展開）</summary>
 
 ```php
-// app/Http/Controllers/Api/V1/TaskController.php
 <?php
+// app/Http/Controllers/Api/V1/TaskController.php
 
 namespace App\Http\Controllers\Api\V1;
 
@@ -357,8 +357,8 @@ class TaskController extends Controller
 `routes/api.php` を開き、内容を次のように **まるごと書き換えます**。`/v1` プレフィックスでバージョンを分け、`apiResource` で 5 つのルートをまとめて定義します。
 
 ```php
-// routes/api.php
 <?php
+// routes/api.php
 
 use App\Http\Controllers\Api\V1\TaskController;
 use Illuminate\Support\Facades\Route;
@@ -382,8 +382,8 @@ sail artisan route:list --path=api
 存在しない ID にアクセスしたとき、JSON の 404 を返すようにします。`app/Exceptions/Handler.php` を開き、内容を次のように **まるごと書き換えます** （`ModelNotFoundException` の `use` 文と `render` メソッドを追加しています）。
 
 ```php
-// app/Exceptions/Handler.php
 <?php
+// app/Exceptions/Handler.php
 
 namespace App\Exceptions;
 
@@ -439,10 +439,10 @@ class Handler extends ExceptionHandler
 | 詳細 | GET | `{{base_url}}/api/v1/tasks/1` | なし | 200 |
 | 検索 | GET | `{{base_url}}/api/v1/tasks?keyword=メール` | なし | 200（1 件） |
 | 絞り込み | GET | `{{base_url}}/api/v1/tasks?status=completed` | なし | 200（1 件） |
-| 登録 | POST | `{{base_url}}/api/v1/tasks` | タスクの内容 | 201 |
-| 更新 | PUT | `{{base_url}}/api/v1/tasks/1` | タスクの内容 | 200 |
+| 登録 | POST | `{{base_url}}/api/v1/tasks` | 下記の JSON | 201 |
+| 更新 | PUT | `{{base_url}}/api/v1/tasks/1` | 下記の JSON | 200 |
 | 削除 | DELETE | `{{base_url}}/api/v1/tasks/5` | なし | 204 |
-| 不正な入力 | POST | `{{base_url}}/api/v1/tasks` | 不正な内容 | 422 |
+| 不正な入力 | POST | `{{base_url}}/api/v1/tasks` | 下記の JSON | 422 |
 | 存在しない ID | GET | `{{base_url}}/api/v1/tasks/99999` | なし | 404 |
 | 上限クランプ | GET | `{{base_url}}/api/v1/tasks?per_page=1000` | なし | `meta.per_page` が 100 |
 
@@ -498,7 +498,19 @@ curl -s -H "Accept: application/json" "http://localhost/api/v1/tasks?keyword=メ
 curl -s -H "Accept: application/json" "http://localhost/api/v1/tasks?status=completed" | jq
 ```
 
-登録（POST）を確認します。Postman では `Body` タブに JSON を入力します（`curl` では `Content-Type: application/json` を付けます）。成功すると **201** が返ります。
+登録（POST）を確認します。Postman では、メソッドを `POST`、URL を `{{base_url}}/api/v1/tasks` にし、`Body` タブで `raw` を選び `JSON` 形式にして、次の内容を貼り付けて `Send` します。
+
+```json
+{
+  "user_id": 1,
+  "title": "API設計のレビュー",
+  "description": "v1 のレスポンス形を確認する",
+  "status": "pending",
+  "due_date": "2026-07-01"
+}
+```
+
+成功すると **201** が返ります。`curl` の場合は、同じ内容を `-d` で送り、`Content-Type: application/json` を付けます。
 
 ```bash
 curl -s -w '\n%{http_code}\n' \
@@ -524,7 +536,16 @@ curl -s -w '\n%{http_code}\n' \
 }
 ```
 
-わざと不正な入力（タスク名なし・不正なステータス）を送ると、**422** とバリデーションエラーが JSON で返ります。
+わざと不正な入力も送って、エラーの形を確認します。Postman の `Body` に次を貼り付けます。`title`（必須）が無く、`status` も許可されていない値（`done`）にしています。
+
+```json
+{
+  "user_id": 1,
+  "status": "done"
+}
+```
+
+送ると、**422** とバリデーションエラーが JSON で返ります。
 
 ```bash
 curl -s -w '\n%{http_code}\n' \
@@ -545,7 +566,17 @@ curl -s -w '\n%{http_code}\n' \
 }
 ```
 
-更新（PUT）と削除（DELETE）も確認します。削除は本文のない **204** が返ります。Postman ではレスポンス欄が空になり、ステータスに `204 No Content` が表示されます。`curl` でステータスを見るには `-i`（レスポンスヘッダーを表示）を使います。
+更新（PUT）と削除（DELETE）も確認します。更新は、メソッドを `PUT`、URL を `{{base_url}}/api/v1/tasks/1` にし、`Body` に次を貼り付けて `Send` します。
+
+```json
+{
+  "user_id": 1,
+  "title": "企画書を作成する（改訂）",
+  "status": "in_progress"
+}
+```
+
+削除は本文のない **204** が返ります。削除はボディ不要で、メソッドを `DELETE`、URL を `{{base_url}}/api/v1/tasks/5` にして `Send` します。Postman ではレスポンス欄が空になり、ステータスに `204 No Content` が表示されます（`curl` でステータスを見るには `-i` でレスポンスヘッダーを表示します）。
 
 ```bash
 # 更新（id=1）→ 200

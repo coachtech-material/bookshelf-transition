@@ -1,13 +1,13 @@
 # 9-5 CRUD（カテゴリ・タスク）と多対多操作
 
-📝 **このハンズオンで使う機能**: `sync` / `toggle`（3-2 ピボット操作（attach / detach / sync / toggle） で学習）、FormRequest（既習）
+📝 **このハンズオンで使う機能**: `sync`（3-2 ピボット操作（attach / detach / sync / toggle） で学習）、FormRequest（既習）
 
 📝 **前提知識**: このセクションは 3-2 ピボット操作（attach / detach / sync / toggle） と 9-4 認証（Fortify） の内容を前提としています。
 
 ## 🎯 このセクションで学ぶこと
 
 - カテゴリとタスクの CRUD を、リソースコントローラと FormRequest で実装する
-- タスクへのタグ付けを `sync`、お気に入りの追加・解除を `toggle` で実装する
+- タスクへのタグ付けを `sync` で実装する
 - 更新時の一意制約バリデーション（`Rule::unique()->ignore()`）と、カテゴリの削除ガードを実装する
 
 このセクションでは、9-2 で配置した画面を、コントローラと FormRequest で動かします。これで、認証付きのタスク管理アプリが、ひととおり使える状態になります。
@@ -18,11 +18,11 @@
 
 ここまでで、画面（9-2）・テーブルとモデル（9-3）・認証（9-4）がそろいました。残るは、画面とデータをつなぐコントローラです。
 
-カテゴリとタスクの CRUD を実装し、そのなかで 3-2 で学んだ多対多の操作を使います。タスクの作成・編集でのタグ付けは、選び直しにそのまま使える `sync`。お気に入りの登録・解除は、押すたびに反転する `toggle`。さらに、更新時の一意制約バリデーションと、タスクが紐づくカテゴリを守る削除ガードも入れます。
+カテゴリとタスクの CRUD を実装し、そのなかで 3-2 で学んだ多対多の操作を使います。タスクの作成・編集でのタグ付けは、選び直しにそのまま使える `sync` で行います。さらに、更新時の一意制約バリデーションと、タスクが紐づくカテゴリを守る削除ガードも入れます。
 
 ### 🧠 先輩エンジニアの思考プロセス
 
-> CRUD でタグのような多対多が絡むと、つい「今ついているタグを調べて、付け外しを計算して…」と複雑に考えがちです。でも編集画面の送信は、`sync` に「選ばれた ID の配列」を渡すだけで済みます。3-2 で `sync` の動きを Tinker で確かめておくと、ここで迷いません。お気に入りも同じで、`toggle` 一発です。多対多の操作は、専用メソッドに任せるのが結局いちばん安全です。
+> CRUD でタグのような多対多が絡むと、つい「今ついているタグを調べて、付け外しを計算して…」と複雑に考えがちです。でも編集画面の送信は、`sync` に「選ばれた ID の配列」を渡すだけで済みます。3-2 で `sync` の動きを Tinker で確かめておくと、ここで迷いません。多対多の操作は、専用メソッドに任せるのが結局いちばん安全です。
 
 ---
 
@@ -38,13 +38,12 @@
 
 ### 🏃 Step 1: コントローラと FormRequest を生成する
 
-カテゴリ・タスク・お気に入りのコントローラと、カテゴリ・タスクの FormRequest を生成します。ルートは 9-2 で定義済みなので、ここではコントローラと FormRequest の中身を実装します。
+カテゴリ・タスクのコントローラと、カテゴリ・タスクの FormRequest を生成します。ルートは 9-2 で定義済みなので、ここではコントローラと FormRequest の中身を実装します。
 
 ```bash
 # task-app ディレクトリで実行
 sail artisan make:controller CategoryController --resource
 sail artisan make:controller TaskController --resource
-sail artisan make:controller FavoriteController
 sail artisan make:request StoreCategoryRequest
 sail artisan make:request UpdateCategoryRequest
 sail artisan make:request StoreTaskRequest
@@ -56,8 +55,8 @@ sail artisan make:request UpdateTaskRequest
 `app/Http/Requests/StoreCategoryRequest.php` を **まるごと書き換えます**。カテゴリ名は必須・255 文字以内・一意です。`attributes()` で、エラーメッセージ中の項目名を「カテゴリ名」にします。
 
 ```php
-// app/Http/Requests/StoreCategoryRequest.php
 <?php
+// app/Http/Requests/StoreCategoryRequest.php
 
 namespace App\Http\Requests;
 
@@ -87,8 +86,8 @@ class StoreCategoryRequest extends FormRequest
 `app/Http/Requests/UpdateCategoryRequest.php` を **まるごと書き換えます**。更新では、自分自身のレコードを一意制約のチェックから除外する必要があります。これを `Rule::unique()->ignore()` で行います。
 
 ```php
-// app/Http/Requests/UpdateCategoryRequest.php
 <?php
+// app/Http/Requests/UpdateCategoryRequest.php
 
 namespace App\Http\Requests;
 
@@ -123,8 +122,8 @@ class UpdateCategoryRequest extends FormRequest
 `app/Http/Controllers/CategoryController.php` を **まるごと書き換えます**。一覧では `withCount('tasks')` で各カテゴリのタスク件数を添えます（5-1 で学んだ集計です）。削除では、タスクが紐づくカテゴリを守る **削除ガード** を入れます。
 
 ```php
-// app/Http/Controllers/CategoryController.php
 <?php
+// app/Http/Controllers/CategoryController.php
 
 namespace App\Http\Controllers;
 
@@ -189,8 +188,8 @@ class CategoryController extends Controller
 `app/Http/Requests/StoreTaskRequest.php` を **まるごと書き換えます**。`status` は 3 値のいずれか（`in`）、`category_id` は存在するカテゴリ（`exists`）、`tags` は任意の配列で各要素が存在するタグ（`tags.*` に `exists`）です。
 
 ```php
-// app/Http/Requests/StoreTaskRequest.php
 <?php
+// app/Http/Requests/StoreTaskRequest.php
 
 namespace App\Http\Requests;
 
@@ -221,8 +220,8 @@ class StoreTaskRequest extends FormRequest
 `app/Http/Requests/UpdateTaskRequest.php` を **まるごと書き換えます**。更新でも検証内容は同じです（アクションごとに違う検証を足したくなったとき、それぞれのクラスに書けるよう分けておきます）。
 
 ```php
-// app/Http/Requests/UpdateTaskRequest.php
 <?php
+// app/Http/Requests/UpdateTaskRequest.php
 
 namespace App\Http\Requests;
 
@@ -260,8 +259,8 @@ class UpdateTaskRequest extends FormRequest
 <summary>app/Http/Controllers/TaskController.php の全体（クリックで展開）</summary>
 
 ```php
-// app/Http/Controllers/TaskController.php
 <?php
+// app/Http/Controllers/TaskController.php
 
 namespace App\Http\Controllers;
 
@@ -277,7 +276,7 @@ class TaskController extends Controller
 {
     public function index(): View
     {
-        $tasks = Task::with(['category', 'tags'])->latest()->paginate(10);
+        $tasks = Task::with('category')->latest()->paginate(10);
 
         return view('tasks.index', compact('tasks'));
     }
@@ -356,44 +355,7 @@ class TaskController extends Controller
 
 ⚠️ **注意**: いまの `edit` / `update` / `destroy` には、所有者かどうかのチェック（認可）がありません。そのため、**ログインしていれば誰でも、他人のタスクを編集・削除できてしまいます**。これは次の 10-1 で Policy を使って塞ぎます。ここではまず CRUD が動くことを優先します。
 
-### 🏃 Step 6: FavoriteController を実装する
-
-`app/Http/Controllers/FavoriteController.php` を **まるごと書き換えます**。お気に入りの登録・解除は `toggle`、お気に入り一覧は、ログインユーザーの `favoriteTasks` を取得します。
-
-```php
-// app/Http/Controllers/FavoriteController.php
-<?php
-
-namespace App\Http\Controllers;
-
-use App\Models\Task;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
-
-class FavoriteController extends Controller
-{
-    public function toggle(Task $task): RedirectResponse
-    {
-        Auth::user()->favoriteTasks()->toggle($task->id);
-
-        return back();
-    }
-
-    public function index(): View
-    {
-        $tasks = Auth::user()->favoriteTasks()->with('category')->paginate(10);
-
-        return view('favorites.index', compact('tasks'));
-    }
-}
-```
-
-🔑 `Auth::user()->favoriteTasks()->toggle($task->id)` が、3-2 で学んだ `toggle` です。詳細画面のお気に入りボタンを押すたびに、登録と解除が交互に切り替わります。「今お気に入りかどうか」を調べて分岐する必要はありません。`return back()` で、押した画面（詳細画面）に戻します。
-
-📝 `tasks/show.blade.php` のお気に入りボタンは、`Auth::user()->favoriteTasks->contains($task->id)` で「すでにお気に入りか」を判定し、ハートの表示（♥ / ♡）を出し分けています。
-
-### 🏃 Step 7: 動作を確認する
+### 🏃 Step 6: 動作を確認する
 
 `sail up -d` と `sail npm run dev` を起動した状態で、ログインしてブラウザで確認します。
 
@@ -409,12 +371,6 @@ class FavoriteController extends Controller
 2. 「タスクを登録」から、タイトル・カテゴリ・状態・期限・タグ（複数選択）を入力して登録する。詳細画面に遷移し、選んだタグが表示される（`sync`）。
 3. 詳細画面の「編集」からタグを選び直して更新する。詳細画面のタグが、選び直した内容に変わる（`sync`）。
 
-最後に **お気に入り** を確認します。
-
-1. タスクの詳細画面で、お気に入りボタン（♡）を押す。表示が「♥ お気に入り中」に変わる（`toggle`）。
-2. もう一度押すと、♡ に戻る（`toggle`）。
-3. ナビの「お気に入り」を開くと、お気に入り中のタスクが一覧に出る。
-
 わざとタイトルを空にして登録すると、「タイトルは必須です。」と日本語のエラーが出て、入力した内容（カテゴリやタグの選択）が保持されることも確認しておきましょう。
 
 ---
@@ -425,7 +381,6 @@ class FavoriteController extends Controller
 - [ ] タスクが紐づくカテゴリを削除しようとすると、削除ガードで止まった
 - [ ] タスクの CRUD が動き、作成時に所有者（ログインユーザー）が設定された
 - [ ] タグ付けが `sync` で動いた（作成・編集で選んだタグだけが付く）
-- [ ] お気に入りの登録・解除が `toggle` で動き、お気に入り一覧に反映された
 - [ ] 不正な入力で日本語のバリデーションエラーが表示され、入力内容が保持された
 
 ---
@@ -433,12 +388,12 @@ class FavoriteController extends Controller
 ## ✨ まとめ
 
 - カテゴリとタスクの CRUD を、リソースコントローラと FormRequest で実装した
-- タグ付けは `sync`（選ばれた ID の配列にそろえる）、お気に入りは `toggle`（押すたびに反転）で実装した
+- タグ付けは `sync`（選ばれた ID の配列にそろえる）で実装した
 - 更新時の一意制約は `Rule::unique()->ignore()` で自分を除外し、カテゴリは削除ガードで守った
 - タスクの作成では `$request->user()->tasks()->create(...)` で所有者を自動設定した。ただし編集・削除の認可はまだなく、誰でも他人のタスクを操作できる状態になっている
 
 ---
 
-この Chapter では、タスク管理アプリをゼロから組み立てました。9-1 で要件を読み解いて ER 図とテーブルを設計し、9-2 で Sail と画面アセットを用意し、9-3 でマイグレーションとモデル、9-4 で認証、9-5 で CRUD と多対多操作（タグ付けの `sync`・お気に入りの `toggle`）を実装しました。これで、認証付きのタスク管理アプリが、ひととおり動く状態になりました。
+この Chapter では、タスク管理アプリをゼロから組み立てました。9-1 で要件を読み解いて ER 図とテーブルを設計し、9-2 で Sail と画面アセットを用意し、9-3 でマイグレーションとモデル、9-4 で認証、9-5 で CRUD と多対多操作（タグ付けの `sync`）を実装しました。これで、認証付きのタスク管理アプリが、ひととおり動く状態になりました。
 
-次の Chapter では、ここに認可・集計・公開 API・自動テストを積み上げ、提出できる品質に仕上げます。最初の 10-1 では、9-5 で残した「誰でも他人のタスクを編集・削除できてしまう」穴を塞ぎます。`TaskPolicy` を実装して所有者だけが編集・削除でき、非所有者には 403 を返し、`@can` で編集・削除ボタンを所有者にだけ表示する制御を加えます。
+次の Chapter では、ここに認可・集計・公開 API・自動テストを積み上げ、完成度の高い状態に仕上げます。最初の 10-1 では、9-5 で残した「誰でも他人のタスクを編集・削除できてしまう」穴を塞ぎます。`TaskPolicy` を実装して所有者だけが編集・削除でき、非所有者には 403 を返し、`@can` で編集・削除ボタンを所有者にだけ表示する制御を加えます。
